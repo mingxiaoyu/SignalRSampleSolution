@@ -1,0 +1,57 @@
+﻿
+@{
+    ViewData["Title"] = "LongPolling";
+}
+
+<h1>LongPolling</h1>
+<div>
+    Long Polling和Polling有类似的地方, 客户端都是发送请求到服务器. 但是不同之处是: 如果服务器没有新数据要发给客户端的话, 那么服务器会继续保持连接, 直到有新的数据产生, 服务器才把新的数据返回给客户端.
+
+    如果请求发出后一段时间内没有响应, 那么请求就会超时. 这时, 客户端会再次发出请求.
+</div>
+
+<div>
+    <button id="submit" type="submit">开始</button>
+    <button id="reset" type="submit">重置</button>
+    结果:<span id="result" style="color:red; font-weight:bolder"></span>
+</div>
+<script type="text/javascript">
+    pollWithTimeout = (url, timeout = 9000) => {
+        return Promise.race([
+            fetch(url),
+            new Promise(
+                (_, reject) => setTimeout(() => reject(new Error('timeout')), timeout)
+            )
+        ]);
+    };
+
+    poll = (id) => {
+        pollWithTimeout(`/api/realtime/longpolling/${id}`)
+            .then(response => {
+                if (response.status === 200) {
+                    response.json().then(j => {
+                        const resultDiv = document.getElementById("result");
+                        resultDiv.innerHTML = j.count;
+                        if (!j.finished) {
+                            poll(id);
+                        }
+                    });
+                }
+            }).catch(response=> poll(id));
+    };
+
+    document.getElementById("submit").addEventListener("click", e => {
+        poll(123);
+    });
+    document.getElementById("reset").addEventListener("click", e => {
+        e.preventDefault();
+        fetch('/api/realtime/reset', {
+            method: 'POST'
+        }).then(response => {
+            if (response.status === 200) {
+                const resultDiv = document.getElementById("result");
+                resultDiv.innerHTML = "";
+            }
+        });
+    });
+</script>

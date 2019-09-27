@@ -1,0 +1,51 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+<button id="submit">Submit</button>
+<div id="result" style="color:green;font-weight:bold;"></div>
+<script src="~/lib/aspnet/signalr/dist/browser/signalr.js"></script>
+<script type="text/javascript">
+    let connection = null;
+    setupConnection = () => {
+
+        connection = new signalR.HubConnectionBuilder()
+            .withUrl("/count")
+            .build();
+
+        connection.on("someFunc", function (obj) {
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "Someone called this,parameters:"+ obj.random;
+        });
+
+        connection.on("ReceiveUpdate", (update) => {
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = update;
+        });
+
+        connection.on("finished", function () {
+            connection.stop();
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "Finished";
+        });
+
+        connection.start().catch(err => console.error(err.toString()));
+    };
+
+    setupConnection();
+
+    document.getElementById("submit").addEventListener("click", e => {
+        e.preventDefault();
+
+        fetch("api/Count", { method: "POST" })
+            .then(response => response.text())
+            .then(id => connection.invoke("GetLatestCount", id));
+    });
+</script>
+

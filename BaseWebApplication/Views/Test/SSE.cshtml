@@ -1,0 +1,46 @@
+﻿
+@{
+    ViewData["Title"] = "Server Sent Events ";
+}
+
+<h1>Server Sent Events</h1>
+<div>
+    使用SSE的话, Web服务器可以在任何时间把数据发送到浏览器, 可以称之为推送. 而浏览器则会监听进来的信息, 这些信息就像流数据一样, 这个连接也会一直保持开放, 直到服务器主动关闭它.
+
+    浏览器会使用一个叫做EventSource的对象用来处理传过来的信息.
+</div>
+<div>
+    <button id="submit" type="submit">开始</button>
+    <button id="reset" type="submit">重置</button>
+    结果:<span id="result" style="color:red; font-weight:bolder"></span>
+</div>
+<script type="text/javascript">
+
+    listen = (id) => {
+        const eventSource = new EventSource(`/api/realtime/sse/${id}`);
+        eventSource.onmessage = (event) => {
+            const resultDiv = document.getElementById("result");
+            console.log(event.data);
+            resultDiv.innerHTML = event.data;
+        };
+        eventSource.onerror = function (e) {
+            console.log("EventSource failed.", e);
+        }
+    };
+
+    document.getElementById("submit").addEventListener("click", e => {
+        e.preventDefault();
+        listen(123);
+    });
+    document.getElementById("reset").addEventListener("click", e => {
+        e.preventDefault();
+        fetch('/api/realtime/reset', {
+            method: 'POST'
+        }).then(response => {
+            if (response.status === 200) {
+                const resultDiv = document.getElementById("result");
+                resultDiv.innerHTML = "";
+            }
+        });
+    });
+</script>

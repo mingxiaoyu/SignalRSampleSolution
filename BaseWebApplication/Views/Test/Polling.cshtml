@@ -1,0 +1,46 @@
+﻿
+@{
+    ViewData["Title"] = "Polling";
+}
+
+<h1>Polling</h1>
+
+<div>
+    <button id="submit" type="submit">开始</button>
+    <button id="reset" type="submit">重置</button>
+    结果:<span id="result" style="color:red; font-weight:bolder"></span>
+</div>
+<script type="text/javascript">
+    let intervalId;
+    poll = (id) => {
+        fetch(`/api/realtime/polling/${id}`)
+            .then(response => {
+                if (response.status === 200) {
+                    response.json().then(j => {
+                        const resultDiv = document.getElementById("result");
+                        resultDiv.innerHTML = j.count;
+                        if (j.finished) {
+                            clearInterval(intervalId);
+                            resultDiv.innerHTML = j.count + ",已结束";
+                        }
+                    });
+                }
+            });
+    };
+
+    document.getElementById("submit").addEventListener("click", e => {
+        e.preventDefault();
+        intervalId = setInterval(poll, 1000, 123);
+    });
+    document.getElementById("reset").addEventListener("click", e => {
+        e.preventDefault();
+        fetch('/api/realtime/reset', {
+            method: 'POST'
+        }).then(response => {
+            if (response.status === 200) {
+                const resultDiv = document.getElementById("result");
+                resultDiv.innerHTML = "";
+            }
+        });
+    });
+</script>
