@@ -1,0 +1,58 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome  @this.User.Identity.Name</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<div class="row">&nbsp;</div>
+<div class="row">
+    <div class="col-6">&nbsp;</div>
+    <div class="col-6">
+        <form class="form-inline">
+            <div class="input-prepend input-append">
+                <input type="text" name="group-message" id="group-message-text" placeholder="Type a message" />
+                <input type="text" name="group-name" id="group-name" placeholder="Type a group name" />
+                <input type="button" id="groupmsg" class="btn" value="Send to Group" />
+                <input type="button" id="join-group" class="btn" value="Join Group" />
+                <input type="button" id="leave-group" class="btn" value="Leave Group" />
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <hr />
+    </div>
+</div>
+<div class="row">
+    <div class="col-6">&nbsp;</div>
+    <div class="col-6">
+        <ul id="messagesList"></ul>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-6">&nbsp;</div>
+    <div class="col-6">
+        <form class="form-inline">
+            <div class="input-prepend input-append">
+                <input type="text" name="user" id="user-message-text" placeholder="User message" />
+                <input type="text" name="User-name" id="user-name" placeholder="User" />
+                <input type="button" id="usermsg" class="btn" value="Send to User" />
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6">&nbsp;</div>
+    <div class="col-6">
+        <ul id="mymessagesList"></ul>
+    </div>
+</div>
+<script src="~/lib/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/chat.js"></script>
